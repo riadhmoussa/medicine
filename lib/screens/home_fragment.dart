@@ -16,12 +16,11 @@ class HomeFragment extends StatelessWidget {
         child: Column(
           children: <Widget>[
             MLHomeTopComponent(),
-            16.height,
             Obx(() {
               if (controller.medicines.isEmpty) {
-                return CircularProgressIndicator(); // Show loading indicator while fetching medicines
+                return CircularProgressIndicator();
               } else {
-                return MLHomeBottomComponent(medicines: controller.medicines.toList());
+                return MLHomeBottomComponent(medicines: controller.medicines.toList(), controller: controller,);
               }
             }),
             64.height,

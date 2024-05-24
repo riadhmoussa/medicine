@@ -1,21 +1,52 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:medicine/routes/app_routes.dart';
 
-class AddMedicineController extends GetxController {
-  var reference = ''.obs;
-  var name = ''.obs;
-  var price = ''.obs;
+import '../model/Medicine.dart';
+
+class AddEditMedicineController extends GetxController {
+  final referenceController = TextEditingController();
+  final nameController = TextEditingController();
+  final priceController = TextEditingController();
   var imageUrl = ''.obs;
 
-  var isValid = false.obs;
+  var isEditMode = false.obs;
+  final medicine = Rxn<Medicine>();
+
+  // List of categories
+  final categories = ['Antibiotic', 'Analgesic', 'Antiseptic', 'Antipyretic', 'Vaccine'].obs;
+  var selectedCategory = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (Get.arguments != null) {
+      medicine.value = Get.arguments as Medicine;
+      referenceController.text = medicine.value?.reference ?? '';
+      nameController.text = medicine.value?.name ?? '';
+      priceController.text = medicine.value?.price.toString() ?? '';
+      imageUrl.value = medicine.value?.image ?? '';
+      selectedCategory.value = medicine.value?.category ?? categories.first;
+      isEditMode.value = true;
+    } else {
+      selectedCategory.value = categories.first;
+    }
+  }
+
+  @override
+  void onClose() {
+    referenceController.dispose();
+    nameController.dispose();
+    priceController.dispose();
+    super.onClose();
+  }
 
   Future<void> onSubmit() async {
-    if (reference.isEmpty) {
+    if (referenceController.text.isEmpty) {
       Get.snackbar(
         'Erreur',
         'La référence est requise.',
@@ -25,7 +56,7 @@ class AddMedicineController extends GetxController {
       return;
     }
 
-    if (name.isEmpty) {
+    if (nameController.text.isEmpty) {
       Get.snackbar(
         'Erreur',
         'Le nom est requis.',
@@ -35,7 +66,7 @@ class AddMedicineController extends GetxController {
       return;
     }
 
-    if (price.isEmpty) {
+    if (priceController.text.isEmpty) {
       Get.snackbar(
         'Erreur',
         'Le prix est requis.',
@@ -55,33 +86,58 @@ class AddMedicineController extends GetxController {
       return;
     }
 
-    // All fields are valid, add medicine to Firebase
     try {
+      if (isEditMode.value) {
+        // Update existing medicine
+        await FirebaseFirestore.instance
+            .collection('medicines')
+            .doc(medicine.value?.uid)
+            .update({
+          'reference': referenceController.text,
+          'name': nameController.text,
+          'price': double.tryParse(priceController.text) ?? 0.0,
+          'imageUrl': imageUrl.value,
+          'category': selectedCategory.value,
+          'updatedAt': Timestamp.now(),
+        });
 
-      // Add medicine data to Firestore collection
-      await FirebaseFirestore.instance.collection('medicines').add({
-        'reference': reference.value,
-        'name': name.value,
-        'price': price.value,
-        'imageUrl': imageUrl.value,
-        'createdAt': Timestamp.now(),
-      });
+        Get.snackbar(
+          'Succès',
+          'Médicament mis à jour avec succès.',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 2), // Set duration for the snackbar
+        );
+      } else {
+        // Add new medicine
+        await FirebaseFirestore.instance.collection('medicines').add({
+          'reference': referenceController.text,
+          'name': nameController.text,
+          'price': double.tryParse(priceController.text) ?? 0.0,
+          'imageUrl': imageUrl.value,
+          'category': selectedCategory.value,
+          'createdAt': Timestamp.now(),
+        });
 
-      // Medicine added successfully, navigate back or show success message
-      Get.back();
-      // Optionally, show a success snackbar
-      Get.snackbar(
-        'Succès',
-        'Médicament ajouté avec succès.',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+        Get.snackbar(
+          'Succès',
+          'Médicament ajouté avec succès.',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 2), // Set duration for the snackbar
+        );
+      }
+
+      print('Navigating back...');
+      Get.offNamed(AppRoutes.adminDashboard);
+      // Alternative navigation
+      // // Use this if you have named routes
+
     } catch (e) {
-      print('Error adding medicine: $e');
-      // Show error snackbar if adding medicine fails
+      print('Error adding/updating medicine: $e');
       Get.snackbar(
         'Erreur',
-        'Une erreur est survenue lors de l\'ajout du médicament.',
+        'Une erreur est survenue lors de l\'ajout/mise à jour du médicament.',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -95,16 +151,12 @@ class AddMedicineController extends GetxController {
     if (pickedFile != null) {
       final File file = File(pickedFile.path);
 
-      // Upload image to Firebase Storage
       try {
         final firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
             .ref('images/${DateTime.now().millisecondsSinceEpoch}');
         await ref.putFile(file);
 
-        // Get the download URL
         final String downloadURL = await ref.getDownloadURL();
-
-        // Save the image URL
         imageUrl.value = downloadURL;
       } catch (e) {
         print('Error uploading image: $e');

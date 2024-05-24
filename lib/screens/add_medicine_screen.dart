@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:medicine/controllers/add_medicine_controller.dart';
+
+import '../controllers/add_medicine_controller.dart';
 
 class AddMedicineScreen extends StatelessWidget {
-  final AddMedicineController controller = Get.put(AddMedicineController());
+  final AddEditMedicineController controller = Get.put(AddEditMedicineController());
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +64,7 @@ class AddMedicineScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               TextFormField(
-                onChanged: (value) {
-                  controller.reference.value = value;
-                },
+                controller: controller.referenceController,
                 decoration: InputDecoration(
                   labelText: 'Référence',
                   border: OutlineInputBorder(
@@ -77,9 +76,7 @@ class AddMedicineScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               TextFormField(
-                onChanged: (value) {
-                  controller.name.value = value;
-                },
+                controller: controller.nameController,
                 decoration: InputDecoration(
                   labelText: 'Nom',
                   border: OutlineInputBorder(
@@ -91,9 +88,7 @@ class AddMedicineScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               TextFormField(
-                onChanged: (value) {
-                  controller.price.value = value;
-                },
+                controller: controller.priceController,
                 decoration: InputDecoration(
                   labelText: 'Prix',
                   border: OutlineInputBorder(
@@ -103,6 +98,27 @@ class AddMedicineScreen extends StatelessWidget {
                   fillColor: Colors.grey[200],
                 ),
               ),
+              SizedBox(height: 20),
+              Obx(() => DropdownButtonFormField<String>(
+                value: controller.selectedCategory.value,
+                items: controller.categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  controller.selectedCategory.value = newValue!;
+                },
+                decoration: InputDecoration(
+                  labelText: 'Catégorie',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                ),
+              )),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {

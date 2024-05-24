@@ -24,6 +24,7 @@ class MedicineController extends GetxController {
           image: data['imageUrl'] ?? '',
           name: data['name'] ?? '',
           reference: data['reference'] ?? '',
+          category: data['category'] ?? '',
           price: double.tryParse(data['price'].toString()) ?? 0.0,
         );
       }).toList();

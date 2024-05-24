@@ -10,6 +10,6 @@ import 'package:medicine/controllers/splash_controller.dart';
 class AddMedicineBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => AddMedicineController());
+    Get.lazyPut(() => AddEditMedicineController());
   }
 }

@@ -6,6 +6,9 @@ import '../model/Medicine.dart';
 
 class HomeFragmentController extends GetxController {
   var medicines = <Medicine>[].obs;
+  var categories = ['All', 'Antibiotic', 'Analgesic', 'Antiseptic', 'Antipyretic', 'Vaccine'].obs;
+  var selectedCategory = 'All'.obs;
+  var searchQuery = ''.obs;
 
   @override
   void onInit() {
@@ -25,6 +28,7 @@ class HomeFragmentController extends GetxController {
           image: data['imageUrl'] ?? '',
           name: data['name'] ?? '',
           reference: data['reference'] ?? '',
+          category: data['category'] ?? '',
           price: double.tryParse(data['price'].toString()) ?? 0.0,
         );
       }).toList();
@@ -35,5 +39,13 @@ class HomeFragmentController extends GetxController {
       print('Error fetching medicines: $e');
       // Handle error fetching medicines
     }
+  }
+
+  List<Medicine> get filteredMedicines {
+    return medicines.where((medicine) {
+      final matchesCategory = selectedCategory.value == 'All' || medicine.category == selectedCategory.value;
+      final matchesSearchQuery = medicine.name.toLowerCase().contains(searchQuery.value.toLowerCase());
+      return matchesCategory && matchesSearchQuery;
+    }).toList();
   }
 }

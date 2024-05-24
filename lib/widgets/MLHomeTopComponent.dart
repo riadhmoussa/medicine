@@ -13,7 +13,7 @@ class MLHomeTopComponent extends StatelessWidget {
     return Container(
       height: 120,
       width: Get.width,
-      margin: EdgeInsets.only(bottom: 16.0),
+      margin: EdgeInsets.only(bottom: 8.0),
       decoration: boxDecorationWithRoundedCorners(
         backgroundColor: mlColorDarkBlue,
         borderRadius: BorderRadius.vertical(

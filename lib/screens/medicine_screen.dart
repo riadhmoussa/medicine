@@ -10,9 +10,6 @@ class MedicineScreen extends StatelessWidget {
     final MedicineController controller = Get.put(MedicineController());
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Liste des médicaments'),
-      ),
       body: Column(
         children: [
           Padding(
@@ -21,7 +18,8 @@ class MedicineScreen extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: 'Recherche par référence',
                 prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0)),
               ),
               onChanged: (value) {
                 controller.searchQuery.value = value;
@@ -30,7 +28,7 @@ class MedicineScreen extends StatelessWidget {
           ),
           Expanded(
             child: Obx(
-                  () {
+              () {
                 if (controller.filteredMedicines.isEmpty) {
                   return Center(child: Text('Aucun médicament trouvé'));
                 }
@@ -48,13 +46,26 @@ class MedicineScreen extends StatelessWidget {
                           fit: BoxFit.cover,
                         ),
                         title: Text(medicine.name),
-                        subtitle: Text('Référence: ${medicine.reference}\nPrix: \$${medicine.price.toStringAsFixed(2)}'),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            // Add logic to remove the medicine from the list
-                            controller.removeMedicine(medicine.uid);
-                          },
+                        subtitle: Text(
+                            'Référence: ${medicine.reference}\nPrix: \$${medicine.price.toStringAsFixed(2)}'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                Get.toNamed(AppRoutes.addMedicine,
+                                    arguments: medicine);
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                // Add logic to remove the medicine from the list
+                                controller.removeMedicine(medicine.uid);
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     );
