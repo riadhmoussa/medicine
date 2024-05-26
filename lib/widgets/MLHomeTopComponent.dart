@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:medicine/routes/app_routes.dart';
 import 'package:nb_utils/nb_utils.dart';
-
+import '../controllers/cart_controller.dart';
 import '../utils/Colors.dart';
 
 class MLHomeTopComponent extends StatelessWidget {
-  final int counter = 2;
+  final CartController cartController = Get.put(CartController());
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +39,30 @@ class MLHomeTopComponent extends StatelessWidget {
                     ],
                   ),
                 ],
+              ),
+              GestureDetector(
+                onTap: () {
+                  Get.toNamed(AppRoutes.addToCart);
+                },
+                child: Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    Icon(Icons.shopping_cart, color: whiteColor, size: 30),
+                    Obx(() {
+                      if (cartController.cartItems.isNotEmpty) {
+                        return CircleAvatar(
+                          radius: 8,
+                          backgroundColor: Colors.red,
+                          child: Text(
+                            '${cartController.cartItems.length}',
+                            style: TextStyle(fontSize: 12, color: Colors.white),
+                          ),
+                        );
+                      }
+                      return Container();
+                    }),
+                  ],
+                ),
               ),
             ],
           ).paddingOnly(right: 16.0, left: 16.0),

@@ -7,11 +7,11 @@ import '../model/command.dart';
 import '../utils/colors.dart';
 
 class CommandFragment extends StatelessWidget {
-  static String tag = '/MLCommandFragment';
 
   @override
   Widget build(BuildContext context) {
-    final CommandsController _commandsController = Get.put(CommandsController());
+    final CommandsController _commandsController = Get.put(
+        CommandsController());
 
     return SafeArea(
       child: Scaffold(
@@ -28,14 +28,16 @@ class CommandFragment extends StatelessWidget {
                 children: [
                   Text("Mes commandes", style: boldTextStyle(size: 20)),
                   Obx(
-                        () => _commandsController.commands.isNotEmpty
+                        () =>
+                    _commandsController.commands.isNotEmpty
                         ? Container(
                       padding: EdgeInsets.all(8.0),
                       decoration: boxDecorationWithRoundedCorners(
                         backgroundColor: Colors.blue.shade500,
                         boxShape: BoxShape.circle,
                       ),
-                      child: Text(_commandsController.commands.length.toString(), style: primaryTextStyle(color: white)),
+                      child: Text(_commandsController.commands.length
+                          .toString(), style: primaryTextStyle(color: white)),
                     )
                         : Container(),
                   ),
@@ -44,7 +46,8 @@ class CommandFragment extends StatelessWidget {
               8.height,
               Expanded(
                 child: Obx(
-                      () => _commandsController.commands.isEmpty
+                      () =>
+                  _commandsController.commands.isEmpty
                       ? Center(
                     child: CircularProgressIndicator(),
                   )
@@ -87,6 +90,15 @@ class CommandCard extends StatelessWidget {
         statusColor = Colors.grey;
     }
 
+    // Create a map to store the count of each medicine
+    Map<String, int> medicineCount = {};
+
+    // Count the occurrence of each medicine
+    for (var item in command.medicines) {
+      String medicineName = item['medicine']['name'];
+      medicineCount[medicineName] = (medicineCount[medicineName] ?? 0) + 1;
+    }
+
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -96,33 +108,34 @@ class CommandCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(command.medicine['name'], style: boldTextStyle(size: 18)),
+            Text('Command ID: ${command.id}', style: boldTextStyle(size: 18)),
             8.height,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Référence: ${command.medicine['reference']}', style: secondaryTextStyle()),
-                Text('Quantité: ${command.quantity}', style: secondaryTextStyle()),
-              ],
+            Text('Date: ${DateFormat('yyyy-MM-dd – kk:mm').format(
+                command.timestamp.toDate())}', style: secondaryTextStyle()),
+            8.height,
+            Text('Statut:', style: secondaryTextStyle()),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(command.status, style: boldTextStyle(color: white)),
             ),
-            8.height,
-            Text('Prix: \$${command.medicine['price']}', style: secondaryTextStyle()),
-            8.height,
-            Text('Date: ${DateFormat('yyyy-MM-dd – kk:mm').format(command.timestamp.toDate())}', style: secondaryTextStyle()),
-            8.height,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Statut:', style: secondaryTextStyle()),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(command.status, style: boldTextStyle(color: white)),
-                ),
-              ],
+            16.height,
+            Text('Medicines:', style: boldTextStyle(size: 18)),
+            // Display each medicine with its quantity
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: medicineCount.entries.map((entry) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Name: ${entry.key}', style: secondaryTextStyle()),
+                    Text('Quantity: ${entry.value}', style: secondaryTextStyle()),
+                  ],
+                );
+              }).toList(),
             ),
           ],
         ),

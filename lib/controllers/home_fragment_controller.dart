@@ -3,8 +3,11 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../model/Medicine.dart';
+import 'cart_controller.dart';
 
 class HomeFragmentController extends GetxController {
+  final CartController cartController = Get.find<CartController>();
+
   var medicines = <Medicine>[].obs;
   var categories = ['All', 'Antibiotic', 'Analgesic', 'Antiseptic', 'Antipyretic', 'Vaccine'].obs;
   var selectedCategory = 'All'.obs;

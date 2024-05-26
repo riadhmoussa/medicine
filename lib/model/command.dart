@@ -2,16 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Command {
   String id;
-  Map<String, dynamic> medicine;
-  int quantity;
+  List<Map<String, dynamic>> medicines;
   String uid;
   Timestamp timestamp;
   String status;
 
   Command({
     required this.id,
-    required this.medicine,
-    required this.quantity,
+    required this.medicines,
     required this.uid,
     required this.timestamp,
     this.status = 'encours',
@@ -20,8 +18,7 @@ class Command {
   factory Command.fromMap(Map<String, dynamic> map) {
     return Command(
       id: map['id'] ?? '',
-      medicine: Map<String, dynamic>.from(map['medicine'] ?? {}),
-      quantity: map['quantity'] ?? 0,
+      medicines: List<Map<String, dynamic>>.from(map['items'] ?? []),
       uid: map['uid'] ?? '',
       timestamp: map['timestamp'] ?? Timestamp.now(),
       status: map['status'] ?? 'encours',
@@ -31,11 +28,11 @@ class Command {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'medicine': medicine,
-      'quantity': quantity,
+      'items': medicines,
       'uid': uid,
       'timestamp': timestamp,
       'status': status,
     };
   }
 }
+

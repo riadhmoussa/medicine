@@ -3,47 +3,36 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:medicine/routes/app_routes.dart';
 import '../model/Medicine.dart';
+import 'cart_controller.dart';
 
 class AddToCartController extends GetxController {
-  var currentWidget = 0.obs;
-  var total = 0.0.obs;
+  final CartController cartController = Get.find<CartController>();
 
-  var selectedItem = Rx<Medicine?>(null);
-  var quantity = 1.obs;
+  var currentWidget = 0.obs;
 
   @override
   void onInit() {
-    selectedItem.value = Get.arguments as Medicine?;
-    total.value = selectedItem.value?.price ?? 0;
     super.onInit();
-  }
-
-  void addToCart() {
-    quantity.value = (quantity.value ?? 1) + 1;
-    total.value = (total.value ?? 0) + (selectedItem.value!.price ?? 0);
-  }
-
-  void removeFromCart() {
-    quantity.value = (quantity.value ?? 1) - 1;
-    if (quantity.value! < 1) {
-      quantity.value = 1;
-    }
-    total.value = (total.value ?? 0) - (selectedItem.value!.price ?? 0);
   }
 
   void submitCommand() async {
     try {
       String? uid = FirebaseAuth.instance.currentUser?.uid;
 
+      List<Map<String, dynamic>> cartItems = cartController.cartItems.map((item) {
+        return {
+          'medicine': item.toMap(),
+          'quantity': cartController.getItemCount(item),
+        };
+      }).toList();
+
       await FirebaseFirestore.instance.collection('commands').add({
-        'medicine': selectedItem.value!.toMap(),
-        'quantity': quantity.value,
+        'items': cartItems,
         'uid': uid,
         'timestamp': Timestamp.now(),
       });
 
-      selectedItem.value = null;
-      quantity.value = 1;
+      cartController.clearCart();
 
       // Show success message
       Get.snackbar('Success', 'Command submitted successfully');
@@ -56,5 +45,4 @@ class AddToCartController extends GetxController {
       Get.snackbar('Error', 'Failed to submit command');
     }
   }
-
 }

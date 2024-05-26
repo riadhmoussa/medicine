@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:medicine/routes/app_routes.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
+import '../controllers/cart_controller.dart';
 import '../controllers/home_fragment_controller.dart';
 import '../model/Medicine.dart';
+import '../routes/app_routes.dart';
 import '../utils/Common.dart';
 
 class MLHomeBottomComponent extends StatelessWidget {
   final List<Medicine> medicines;
   final HomeFragmentController controller;
+
   MLHomeBottomComponent({super.key, required this.medicines, required this.controller});
 
   @override
   Widget build(BuildContext context) {
+    final CartController cartController = Get.find();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +80,7 @@ class MLHomeBottomComponent extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
-              childAspectRatio: 0.75,
+              childAspectRatio: 0.6,
             ),
             itemCount: controller.filteredMedicines.length,
             itemBuilder: (BuildContext context, int index) {
@@ -105,6 +108,26 @@ class MLHomeBottomComponent extends StatelessWidget {
                       4.height,
                       Text('Prix: ${medicine.price}').paddingOnly(left: 8.0), // Display price
                       10.height,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.remove_circle_outline),
+                            onPressed: () {
+                              cartController.removeItem(medicine);
+                            },
+                          ),
+                          Obx(() {
+                            return Text('${cartController.getItemCount(medicine)}');
+                          }),
+                          IconButton(
+                            icon: Icon(Icons.add_circle_outline),
+                            onPressed: () {
+                              cartController.addItem(medicine);
+                            },
+                          ),
+                        ],
+                      ).paddingOnly(left: 8.0, right: 8.0),
                     ],
                   ),
                 ),
@@ -116,3 +139,4 @@ class MLHomeBottomComponent extends StatelessWidget {
     );
   }
 }
+

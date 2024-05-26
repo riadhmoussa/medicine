@@ -68,6 +68,15 @@ class AdminCommandCard extends StatelessWidget {
         statusColor = Colors.grey;
     }
 
+    // Create a map to store the count of each medicine
+    Map<String, int> medicineCount = {};
+
+    // Count the occurrence of each medicine
+    for (var item in command.medicines) {
+      String medicineName = item['medicine']['name'] as String;
+      medicineCount[medicineName] = (medicineCount[medicineName] ?? 0) + 1;
+    }
+
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -77,18 +86,17 @@ class AdminCommandCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(command.medicine['name'], style: boldTextStyle(size: 18)),
-            8.height,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Référence: ${command.medicine['reference']}', style: secondaryTextStyle()),
-                Text('Quantité: ${command.quantity}', style: secondaryTextStyle()),
-              ],
-            ),
-            8.height,
-            Text('Prix: \$${command.medicine['price']}', style: secondaryTextStyle()),
-            8.height,
+            for (var entry in medicineCount.entries) ...[
+              Text('Name: ${entry.key}', style: boldTextStyle(size: 18)),
+              8.height,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Quantity: ${entry.value}', style: secondaryTextStyle()),
+                ],
+              ),
+              8.height,
+            ],
             Text('Date: ${DateFormat('yyyy-MM-dd – kk:mm').format(command.timestamp.toDate())}', style: secondaryTextStyle()),
             8.height,
             Row(

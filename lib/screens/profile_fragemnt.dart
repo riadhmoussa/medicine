@@ -5,10 +5,11 @@ import '../controllers/profile_controller.dart';
 import '../widgets/MLProfileBottomComponent.dart';
 
 class ProfileFragment extends StatelessWidget {
-  final ProfileController profileController = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
+    final ProfileController profileController = Get.put(ProfileController());
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
